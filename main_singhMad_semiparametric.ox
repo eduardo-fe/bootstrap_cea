@@ -3,8 +3,7 @@
 #include <oxfloat.h>
 #include <oxdraw.oxh>
 
-
-dgp2(N, C_0, C_1, E_0, E_1)
+dgp1(N, theta, C_0, C_1, E_0, E_1)
 {
 
 /* Singh Maddala Distribution*/
@@ -20,17 +19,43 @@ dgp2(N, C_0, C_1, E_0, E_1)
 	decl v2 = ranu(N,1) .< 0.5 .? fabs(w2 - u2) .: 1- fabs(1-w2-u2);
 	
 	 
-	decl k=1; // If k=1 then log-logistic distribution.
-	decl c=1;	// If c=1, then Pareto Type II.
+	//decl k=1; // If k=1 then log-logistic distribution.
+	//decl c=1;	// If c=1, then Pareto Type II.
+	
+	C_0[0] = fabs(quann(u1));
+	C_1[0] = fabs(quann(u2));
+	E_0[0] = fabs(quann(v1));
+	E_1[0] = fabs(quann(v2))+theta;
+
+}
+
+dgp2(N, theta, k, c, C_0, C_1, E_0, E_1)
+{
+
+/* Singh Maddala Distribution*/
+	decl rho = 0.5;
+	
+	decl A = (sqrt((49+rho)/(1+rho))-5)/2 ;
+	decl w1= ranbeta(N,1,A,1) ;
+	decl w2= ranbeta(N,1,A,1);  
+	decl u1 = ranu(N,1);
+	decl u2 = ranu(N,1);
+	
+	decl v1 = ranu(N,1) .< 0.5 .? fabs(w1 - u1) .: 1- fabs(1-w1-u1);
+	decl v2 = ranu(N,1) .< 0.5 .? fabs(w2 - u2) .: 1- fabs(1-w2-u2);
+	
+	 
+	//decl k=1; // If k=1 then log-logistic distribution.
+	//decl c=1;	// If c=1, then Pareto Type II.
 	
 	C_0[0] = (((1-u1).^(-1/k) -1)).^(1/c);
 	C_1[0] = (((1-u2).^(-1/k) -1)).^(1/c);
 	E_0[0] = (((1-v1).^(-1/k) -1)).^(1/c);
-	E_1[0] = (((1-v2).^(-1/k) -1)).^(1/c);
+	E_1[0] = (((1-v2).^(-1/k) -1)).^(1/c)+theta;
 
 }
 
-dgp4(N,K,alpha, C_0, C_1, E_0, E_1)
+dgp4(N,theta,K,alpha, C_0, C_1, E_0, E_1)
 {
 decl rho = 0.5;
 
@@ -64,6 +89,20 @@ estimate(K, C_0, C_1, E_0, E_1, INB, vINB, CI_L, CI_U, stud)
 	CI_U[0] = INB[0] + 1.96*sqrt(vINB[0])/sqrt(rows(C_0));	
 	
 }
+
+iidbootstrap(N,B0, B1, C_0, E_0, C_1, E_1)
+{
+    
+    decl B0star = B0[ranu(1,N) * N][];
+    decl B1star = B1[ranu(1,N) * N][];
+    C_0[0] = B0star[][0];
+    E_0[0] = B0star[][1];
+
+    C_1[0] = B1star[][0];
+    E_1[0] = B1star[][1];
+    
+}
+
 
 
 moonbootstrap(N,m,B0, B1, C_0, E_0, C_1, E_1)
@@ -101,7 +140,137 @@ wildbootstrap(N,B0, B1, C_0, E_0, C_1, E_1){
 
 }
 
+randinf(N,B0, B1, C_0, E_0, C_1, E_1)
+{
 
+	decl randomizer = rann(N*2,1) ;
+	
+	decl B = (B0|B1)~randomizer;
+
+	B=sortbyc(B, 2);
+	
+	C_0[0] =B[0:N-1][0];
+	E_0[0] =B[0:N-1][1];
+	C_1[0] =B[N:][0];
+	E_1[0] =B[N:][1];
+	
+}
+
+asymptotic(K, theta, C_0, C_1, E_0, E_1, inb, vinb, ci_l, ci_u, tstat, ci_rej, p_rej)
+{
+
+	decl  INB, vINB, CI_L, CI_U, stud;
+	
+	estimate(K, C_0, C_1, E_0, E_1, &INB, &vINB, &CI_L, &CI_U, &stud);
+	inb[0]=INB;
+	vinb[0]=vINB;
+	ci_l[0]=CI_L;
+	ci_u[0]=CI_U;
+	tstat[0]=stud;
+	
+	if( theta> CI_L && theta< CI_U){
+		ci_rej[0]= 1;
+	}
+	else if( theta< CI_L || theta > CI_U){
+		ci_rej[0]= 0;
+	}
+	// Two sided test. Arguably, we should be doing 1 sided tests (INB > 0?)
+	if(fabs(stud)>1.96)
+	{
+		p_rej[0]=1;
+	}
+	else{
+		p_rej[0]=0;
+	}
+}
+
+bs(K, B, type, mOn, N,theta, INB, vINB, C_0, C_1, E_0, E_1, ci_l, ci_u, ci_rej, p_rej)
+{
+	decl C_0_star, E_0_star, C_1_star, E_1_star,b;
+	decl INB_b, vINB_b, CI_L_b, CI_U_b, stud_b, mRej;
+	decl c_alpha = (B+1)*0.05/2;
+	decl c_beta = (B+1)*(1-(0.05/2)); 
+	decl mINB = <>;
+	decl mSeINB = <>;
+	decl mZ = <>;
+	for(b = 0; b < B; ++b)
+	{
+
+		if(type ==0){
+			iidbootstrap(N, C_0~E_0, C_1~E_1, &C_0_star, &E_0_star, &C_1_star, &E_1_star);
+		}
+		else if(type ==1){
+			moonbootstrap(N, mOn, C_0~E_0, C_1~E_1, &C_0_star, &E_0_star, &C_1_star, &E_1_star);
+		}
+		else if (type==2){
+			wildbootstrap(N,  C_0~E_0, C_1~E_1, &C_0_star, &E_0_star, &C_1_star, &E_1_star);
+		}
+		estimate(K, C_0_star, C_1_star, E_0_star, E_1_star, &INB_b, &vINB_b, &CI_L_b, &CI_U_b,&stud_b);
+		mINB = mINB | INB_b;
+		mSeINB = mSeINB | sqrt(vINB_b);
+		mZ = mZ | ((INB_b - INB) /  sqrt(vINB_b));	  
+	}
+
+	/* Get percentiles of the boostrap distribution for the studentized INB */
+	mZ = sortc(mZ);
+	decl z_u = mZ[c_alpha -1]; // 1-a percentile goes to lower limit
+	decl z_l = mZ[c_beta -1];  // a percentile goes to upper limit
+
+	// Rejections null hypothesis.
+	mRej = meanc( fabs(mZ).>= fabs( INB/sqrt(vINB)) .? 1 .: 0 );
+	p_rej[0]= mRej <= 0.05.? 1 .: 0;
+	// coverage
+	 
+	ci_l[0]	= INB - z_l*sqrt(vINB);
+	ci_u[0] = INB - z_u*sqrt(vINB);
+	if( theta> ci_l[0] && theta< ci_u[0]){
+		ci_rej[0]= 1;
+	}
+	else if( theta< ci_l[0] || theta > ci_u[0]){
+		ci_rej[0] =  0;
+	}
+
+}
+
+fisher(K, B, N,theta, INB, vINB, C_0, C_1, E_0, E_1, ci_l, ci_u, ci_rej, p_rej)
+{
+  	decl C_0_star, E_0_star, C_1_star, E_1_star,b;
+	decl INB_b, vINB_b, CI_L_b, CI_U_b, stud_b, mRej;
+	decl c_alpha = (B+1)*0.05/2;
+	decl c_beta = (B+1)*(1-(0.05/2)); 
+	decl mINB = <>;
+	decl mSeINB = <>;
+	decl mZ = <>;
+		for(b = 0; b < B; ++b)
+		{
+			randinf(N,  C_0~E_0, C_1~E_1, &C_0_star, &E_0_star, &C_1_star, &E_1_star);
+			estimate(K, C_0_star, C_1_star, E_0_star, E_1_star, &INB_b, &vINB_b, &CI_L_b, &CI_U_b,&stud_b);
+			mINB = mINB | INB_b;
+		 
+			mZ = mZ | (INB_b / sqrt(vINB_b));	  
+		}
+
+		/* Get percentiles of the boostrap distribution for the studentized INB */
+	mZ = sortc(mZ);
+	decl z_u = mZ[c_alpha -1]; // 1-a percentile goes to lower limit
+	decl z_l = mZ[c_beta -1];  // a percentile goes to upper limit
+
+	// Rejections null hypothesis.
+	mRej = meanc( fabs(mZ).>= fabs( INB/sqrt(vINB)) .? 1 .: 0 );
+	p_rej[0]= mRej <= 0.05.? 1 .: 0;
+	// coverage
+	 
+	ci_l[0]	= INB - z_l*sqrt(vINB);
+	ci_u[0] = INB - z_u*sqrt(vINB);
+	if( theta> ci_l[0] && theta< ci_u[0]){
+		ci_rej[0]= 1;
+	}
+	else if( theta< ci_l[0] || theta > ci_u[0]){
+		ci_rej[0] =  0;
+	}
+
+
+}
 
 main()
 {
@@ -114,11 +283,15 @@ decl INB_b, vINB_b, CI_L_b, CI_U_b, stud_b, mRej;
 /* Parameters of the simulation */
 
 decl K = 1 ; //20000;
-decl B = 199;
-decl R = 10000 ;
+decl B = 399;
+decl R = 50000 ;
 decl theta = 0;
+decl k=1;  // If k=1 then log-logistic distribution.
+decl c=2;  // If c=1, then Pareto Type II.
+decl typeBoot, mOn;
 
-for(N = 20; N<1000; N*=2){
+decl mRES =<>;
+for(N = 50; N<=200; N*=2){
 
 	decl c_alpha = (B+1)*0.05/2;
 	decl c_beta = (B+1)*(1-(0.05/2)); 
@@ -126,191 +299,96 @@ for(N = 20; N<1000; N*=2){
 	decl mB_esti=<>;
 	decl mR_asy = <>;
 	decl mR_bot = <>;
+	decl mR_fisher = <>;
 	decl mP_asy=<>;
 	decl mP_bot=<>;
-
+	decl mP_fisher=<>;
+	decl mR_iidbot =<>;
+	decl mP_iidbot=<>;
+	decl mR_moon70bot =<>;
+	decl mP_moon70bot =<>;
+	decl mR_moon90bot =<>;
+	decl mP_moon90bot =<>;
+	decl mR_moon80bot =<>;
+	decl mP_moon80bot =<>;
+	
 	for(r=0; r<R; ++r)
 	{
-	   	
-		dgp2(N, &C_0, &C_1, &E_0, &E_1);
-		//dgp4(N,1,1.5, &C_0, &C_1, &E_0, &E_1);	  //First param is minimum and second is alpha (more tail)
 
-		if(r==0){
-		println(minc(C_0)~maxc(C_0)~meanc(C_0)~minc(C_1)~maxc(C_1)~meanc(C_1));
-		}
-		// Asymptotic Method.
-		
-		estimate(K, C_0, C_1, E_0, E_1, &INB, &vINB, &CI_L, &CI_U, &stud);
+	//	dgp1(N, theta,&C_0, &C_1, &E_0, &E_1);
+
+		dgp2(N, theta,k,c, &C_0, &C_1, &E_0, &E_1);
+		//dgp4(N,theta,1,1 , &C_0, &C_1, &E_0, &E_1);	  //First param is minimum and second is alpha (more tail)
 
 		
-		if( theta> CI_L && theta< CI_U){
-		  	mR_asy = mR_asy| 1;
-		}
-		else if( theta< CI_L || theta > CI_U){
-			mR_asy = mR_asy| 0;
-		}
-		// Two sided test. Arguably, we should be doing 1 sided tests (INB > 0?)
-		if(fabs(stud)>1.96)
-		{
-			mP_asy=mP_asy|1;
-		}
-		else{
-			mP_asy=mP_asy|0;
-		}
-			
-		/* Part 3: IID Bootstrap */
-
-		decl mINB = <>;
-		decl mSeINB = <>;
-		decl mZ = <>;
-		for(b = 0; b < B; ++b)
-		{
-			//moonbootstrap(N, floor(N*0.75), C_0~E_0, C_1~E_1, &C_0_star, &E_0_star, &C_1_star, &E_1_star);
-			wildbootstrap(N,  C_0~E_0, C_1~E_1, &C_0_star, &E_0_star, &C_1_star, &E_1_star);
-			estimate(K, C_0_star, C_1_star, E_0_star, E_1_star, &INB_b, &vINB_b, &CI_L_b, &CI_U_b,&stud_b);
-			mINB = mINB | INB_b;
-			mSeINB = mSeINB | sqrt(vINB_b);
-			mZ = mZ | ((INB_b - INB) /  sqrt(vINB_b));	  
-		}
-
-		/* Get percentiles of the boostrap distribution for the studentized INB */
-		mZ = sortc(mZ);
-	   	decl z_u = mZ[c_alpha -1]; // 1-a percentile goes to lower limit
-		decl z_l = mZ[c_beta -1];  // a percentile goes to upper limit
-
-		// Rejections null hypothesis.
-		mRej = meanc( fabs(mZ).>= fabs( INB/sqrt(vINB)) .? 1 .: 0 );
-		mP_bot=mP_bot | (mRej <= 0.05.? 1 .: 0);
-
-		// Studentized.	  Comment what follows, to line 281 to run the non-studentized version. 
-
-		mB_esti = mB_esti | meanc(mINB); 
-		decl ci_l_b	= INB - z_l*sqrt(vINB);
-		decl ci_u_b = INB - z_u*sqrt(vINB);
-
-		// Coverage of the boostrap CI
+		decl ci_rej, p_rej;
+		asymptotic(K, theta, C_0, C_1, E_0, E_1, &INB, &vINB, &CI_L, &CI_U, &stud, &ci_rej, &p_rej);
+		mR_asy =mR_asy| ci_rej;
+		mP_asy= mP_asy| p_rej;
 		
-		if( theta> ci_l_b && theta< ci_u_b){
-			mR_bot= mR_bot| 1;
-		}
-		else if( theta< ci_l_b || theta > ci_u_b){
-			mR_bot = mR_bot| 0;
-		}
 
-	
-		// noStudentized.	Remove flags to activate this code and run the non-studentized version. 		
-		/*
-		mB_esti = mB_esti | meanc(mINB); 
-		mZ = sortc(mINB);
-		decl z_l = mZ[c_alpha -1]; // 1-a percentile goes to lower limit
-		decl z_u = mZ[c_beta -1];  // a percentile goes to upper limit
-	   	decl ci_l_b	= z_l;
-	   	decl ci_u_b = z_u;
-		if( theta> ci_l_b && theta< ci_u_b){
-			mR_bot= mR_bot| 1;
-		}
-		else if( theta< ci_l_b || theta > ci_u_b){
-			mR_bot = mR_bot| 0;
-		}
-		*/
+		decl ci_rej_b, p_rej_b, ci_l_b, ci_u_b;
+		mOn=0;
+		typeBoot =0;
+		bs(K, B, typeBoot, mOn, N,theta, INB, vINB, C_0, C_1, E_0, E_1, &ci_l_b, &ci_u_b, &ci_rej_b, &p_rej_b);
+		mR_iidbot= mR_iidbot| ci_rej_b;
+		mP_iidbot= mP_iidbot | p_rej_b;
 
-			
+		
+		mOn=floor(0.9*N);
+		typeBoot =1;
+		bs(K, B, typeBoot, mOn, N,theta, INB, vINB, C_0, C_1, E_0, E_1, &ci_l_b, &ci_u_b, &ci_rej_b, &p_rej_b);
+		mR_moon90bot= mR_moon90bot| ci_rej_b;
+		mP_moon90bot= mP_moon90bot | p_rej_b;
+
+		mOn=floor(0.8*N);
+		typeBoot =1;
+		bs(K, B, typeBoot, mOn, N,theta, INB, vINB, C_0, C_1, E_0, E_1, &ci_l_b, &ci_u_b, &ci_rej_b, &p_rej_b);
+		mR_moon80bot= mR_moon80bot| ci_rej_b;
+		mP_moon80bot= mP_moon80bot | p_rej_b;
+
+		mOn=floor(0.7*N);
+		typeBoot =1;
+		bs(K, B, typeBoot, mOn, N,theta, INB, vINB, C_0, C_1, E_0, E_1, &ci_l_b, &ci_u_b, &ci_rej_b, &p_rej_b);
+		mR_moon70bot= mR_moon70bot| ci_rej_b;
+		mP_moon70bot= mP_moon70bot | p_rej_b;
+		
+		 
+		typeBoot =2;
+		bs(K, B, typeBoot, mOn, N,theta, INB, vINB, C_0, C_1, E_0, E_1, &ci_l_b, &ci_u_b, &ci_rej_b, &p_rej_b);
+		mR_bot= mR_bot| ci_rej_b;
+		mP_bot= mP_bot | p_rej_b;
+
+
+
+
+		decl ci_rej_f, p_rej_f, ci_l_f, ci_u_f;
+		fisher(K, B, N,theta, INB, vINB, C_0, C_1, E_0, E_1, &ci_l_f, &ci_u_f, &ci_rej_f, &p_rej_f);
+		mR_fisher= mR_fisher| ci_rej_f;
+		mP_fisher= mP_fisher | p_rej_f;
 
 	}		
 
-	
-
-	print("%c",{"N", "R", "B", "Asymptotic","Bootstrap","R ASY", "R b"}, "%r",{"Coverage"}, N~R~B~meanc(mR_asy)~meanc(mR_bot)~meanc(mP_asy)~meanc(mP_bot)) ;
+	print("%c",{"N", "R", "B", "Theta","k","c"},  N~R~B~theta~k~c);
+	print("%c",{"Coverage", "Rejections"}, "%r",{"Asy", "iid", "moon 90", "moon 80", "moon 70", "Wild","Fisher"}, (meanc(mR_asy)~meanc(mP_asy))|
+	(meanc(mR_iidbot)~meanc(mP_iidbot))|(meanc(mR_moon90bot)~meanc(mP_moon90bot))|
+	(meanc(mR_moon80bot)~meanc(mP_moon80bot))|(meanc(mR_moon80bot)~meanc(mP_moon70bot)) |
+	(meanc(mR_bot)~meanc(mP_bot))|(meanc(mR_fisher)~meanc(mP_fisher)));
   
-
-
-
+	mRES= mRES|	N~R~B~ (
+		(meanc(mR_asy)~meanc(mP_asy))~
+	(meanc(mR_iidbot)~meanc(mP_iidbot))~(meanc(mR_moon90bot)~meanc(mP_moon90bot))~
+	(meanc(mR_moon80bot)~meanc(mP_moon80bot))~(meanc(mR_moon80bot)~meanc(mP_moon70bot)) ~
+	(meanc(mR_bot)~meanc(mP_bot))~(meanc(mR_fisher)~meanc(mP_fisher))
+	);
 }
 
+print(mRES);
 
-
+decl s=sprint("mRES","_k=",k,"_c=",c,"_theta=",theta,"_dgp=2");
+print(s);
+savemat(sprint(s,".csv"), mRES, {"N", "R", "B","CAsyy","Rasy", "Ciid","Riid", "Cmoon90", "Rmoon90",
+"Cmoon80","Rmoon80", "Cmoon70","Rmoon70", "CWild","RWild","CFisher","RFisher"});
 }
 
-
-
-
-
-/* Semiparametric bootstrap
-
-alphahat(N,Y, alphaHat,  y0, nDraws)
-{
-	decl k=sqrt(N);
-	decl n=N-1;	
-	decl logYnk1 = Y[n-k+1][];
-	decl H = meanc(log(Y[n-k+2:][])-log(logYnk1));
-	alphaHat[0]=1/H;
-	//H = 0.95;// THis is either H or a value in 0-1
-	decl ptail = H*k/N;								  
-	y0[0] = Y[floor(N*(1-ptail[0]))][];
- 	nDraws[0]= floor((1-ptail[0])*N);
-}
-
-spbootstrap(N,	C_0, C_0_aph, C_0_y0, C_0_nDraws,
-				C_1, C_1_aph, C_1_y0, C_1_nDraws,
-				E_0, E_0_aph, E_0_y0, E_0_nDraws,
-				E_1, E_1_aph, E_1_y0, E_1_nDraws,
-				C_0_star, E_0_star, C_1_star, E_1_star)
-{
-	
-	decl ytrim = C_0[0:C_0_nDraws-1][];
-	
-	decl ystar = ytrim[C_0_nDraws*ranu(1,C_0_nDraws)][];
-	
-	decl tailstar= C_0_y0*( (1- ranu(N-C_0_nDraws,1)).^(-1/C_0_aph) );
-
-	C_0_star[0]=	(ystar|tailstar);
-
-	ytrim = C_1[0:C_1_nDraws-1][];
-	ystar = ytrim[C_1_nDraws*ranu(1,C_1_nDraws)][];
-	tailstar= C_1_y0*( (1- ranu(N-C_1_nDraws,1)).^(-1/C_1_aph) );
-	C_1_star[0]=	(ystar|tailstar);
-
-	ytrim = E_0[0:E_0_nDraws-1][];
-	ystar = ytrim[E_0_nDraws*ranu(1,E_0_nDraws)][];
-	tailstar= E_0_y0*( (1- ranu(N-E_0_nDraws,1)).^(-1/E_0_aph) );
-	E_0_star[0]=	(ystar|tailstar);
-	
-	ytrim = E_1[0:E_1_nDraws-1][];
-	ystar = ytrim[E_1_nDraws*ranu(1,E_1_nDraws)][];
-	tailstar= E_1_y0*( (1- ranu(N-E_1_nDraws,1)).^(-1/E_1_aph) );
-	E_1_star[0]=	(ystar|tailstar);
-    
-}
-
-/*alphahat(N, Y)
-{
-	
-	decl k=sqrt(N);
-	decl n=N-1;
-	
-	decl sortY = sortc(Y);
-
-	
-	decl logYnk1 = sortY[n-k+1][];
-	decl H = meanc(log(sortY[n-k+2:][])-log(logYnk1));
-	decl alphaHat=1/H;
-	//H = 0.5;// THis is either H or a value in 0-1
-	decl ptail = H*k/N;
-									  
-	decl y0 = sortY[floor(N*(1-ptail))][];
-	
- 	decl noDraws= floor((1-ptail)*N);
-	decl ytrim = sortY[0:noDraws-1][];
-	decl ystar = ytrim[noDraws*ranu(1,noDraws)][];
-	decl tailstar= y0*( (1- ranu(N-noDraws,1)).^(-1/alphaHat) );
-
-	return(ystar|tailstar);
-
-	
-}
-
-	 */
-
-//
-
-*/
+				 
