@@ -1,0 +1,262 @@
+\begin{thebibliography}{38}
+\providecommand{\natexlab}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem[{Athreya(1987)}]{athreya1987aos}
+\textbf{Athreya, K.B.} (1987).
+\newblock {Bootstrap of the Mean in the Infinite Variance Case}.
+\newblock \emph{The Annals of Statistics}, 15(2): 724 -- 731
+
+\bibitem[{Ben et~al.(2022)Ben, van Dongen, Alili, Heymans, Twisk,
+  MacNeil-Vroomen, de~Wit, van Dijk, Oosterhuis, and Bosmans}]{benEtal2022ejhe}
+\textbf{Ben, {\^A}.J.}, \textbf{van Dongen, J.M.}, \textbf{Alili, M.E.},
+  \textbf{Heymans, M.W.}, \textbf{Twisk, J.W.R.}, \textbf{MacNeil-Vroomen,
+  J.L.}, \textbf{de~Wit, M.}, \textbf{van Dijk, S.E.M.}, \textbf{Oosterhuis,
+  T.}, and \textbf{Bosmans, J.E.} (2022).
+\newblock The handling of missing data in trial-based economic evaluations:
+  should data be multiply imputed prior to longitudinal linear mixed-model
+  analyses?
+\newblock \emph{The European Journal of Health Economics}.
+\newblock \doi{10.1007/s10198-022-01525-y}
+
+\bibitem[{Beran(1988)}]{beran1988AoS}
+\textbf{Beran, R.} (1988).
+\newblock {Discussion: Theoretical Comparison of Bootstrap Confidence
+  Intervals}.
+\newblock \emph{The Annals of Statistics}, 16(3): 956 -- 959
+
+\bibitem[{Bugni(2010)}]{bugni2010econometrica}
+\textbf{Bugni, F.A.} (2010).
+\newblock Bootstrap inference in partially identified models defined by moment
+  inequalities: Coverage of the identified set.
+\newblock \emph{Econometrica}, 78(2): 735--753
+
+\bibitem[{Cameron et~al.(2008{\natexlab{a}})Cameron, Gelbach, and
+  Miller}]{cameronGelbachMiller2008REStats}
+\textbf{Cameron, A.C.}, \textbf{Gelbach, J.B.}, and \textbf{Miller, D.L.}
+  (2008{\natexlab{a}}).
+\newblock Bootstrap-{Based} {Improvements} for {Inference} with {Clustered}
+  {Errors}.
+\newblock \emph{The Review of Economics and Statistics}, 90(3): 414--427.
+\newblock ISSN 0034-6535.
+\newblock \doi{10.1162/rest.90.3.414}
+
+\bibitem[{Cameron et~al.(2008{\natexlab{b}})Cameron, Gelbach, and
+  Miller}]{CameronGelbachMiller2008REStat}
+\textbf{Cameron, C.}, \textbf{Gelbach, J.}, and \textbf{Miller, D.}
+  (2008{\natexlab{b}}).
+\newblock Bootstrap-based improvements for inference with clustered errors.
+\newblock \emph{Review of Economics and Statistics.}, 90: 414--427
+
+\bibitem[{Cattaneo et~al.(2015)Cattaneo, Frandsen, and
+  Titiunik}]{CattaneoFrandsenTitiunik2015jcausalInference}
+\textbf{Cattaneo, M.D.}, \textbf{Frandsen, B.R.}, and \textbf{Titiunik, R.}
+  (2015).
+\newblock \emph{Journal of Causal Inference}, 3(1): 1--24.
+\newblock \doi{doi:10.1515/jci-2013-0010}
+
+\bibitem[{Cavaliere et~al.(2013)Cavaliere, Georgiev, and
+  Taylor}]{cavaliere2013econometricreviews}
+\textbf{Cavaliere, G.}, \textbf{Georgiev, I.}, and \textbf{Taylor, A.M.R.}
+  (2013).
+\newblock Wild bootstrap of the sample mean in the infinite variance case.
+\newblock \emph{Econometric Reviews}, 32(2): 204--219
+
+\bibitem[{Cornea-Madeira and Davidson(2015)}]{corneaDavidson2015et}
+\textbf{Cornea-Madeira, A.} and \textbf{Davidson, R.} (2015).
+\newblock A parametric bootstrap for heavy-tailed distributions.
+\newblock \emph{Econometric Theory}, 31(3): 449--470.
+\newblock ISSN 02664666, 14694360
+
+\bibitem[{Davidson and Hinkley(1997)}]{DavidsonHinkley1997Book}
+\textbf{Davidson, A.} and \textbf{Hinkley, D.V.} (1997).
+\newblock \emph{Bootstrap Methods and their Applications}.
+\newblock Cambridge University Press
+
+\bibitem[{Davidson and Flachaire(2007)}]{davidsonFlachaire2007joe}
+\textbf{Davidson, R.} and \textbf{Flachaire, E.} (2007).
+\newblock Asymptotic and bootstrap inference for inequality and poverty
+  measures.
+\newblock \emph{Journal of Econometrics}, 141(1): 141--166.
+\newblock Semiparametric methods in econometrics
+
+\bibitem[{Davidson and Flachaire(2008)}]{davidsonFlachaire2008joe}
+\textbf{Davidson, R.} and \textbf{Flachaire, E.} (2008).
+\newblock The wild bootstrap, tamed at last.
+\newblock \emph{Journal of Econometrics}, 146(1): 162--169.
+\newblock ISSN 0304-4076.
+\newblock \doi{https://doi.org/10.1016/j.jeconom.2008.08.003}
+
+\bibitem[{Djogbenou et~al.(2019)Djogbenou, MacKinnon, and
+  Nielsen}]{djogbenouMacKinnonMorten2019joe}
+\textbf{Djogbenou, A.A.}, \textbf{MacKinnon, J.G.}, and \textbf{Nielsen,
+  M.{\O}.} (2019).
+\newblock Asymptotic theory and wild bootstrap inference with clustered errors.
+\newblock \emph{Journal of Econometrics}, 212(2): 393--412.
+\newblock ISSN 0304-4076.
+\newblock \doi{https://doi.org/10.1016/j.jeconom.2019.04.035}
+
+\bibitem[{Efron(1979)}]{Efron1979AoS}
+\textbf{Efron, B.} (1979).
+\newblock Bootstrap methods: another look at the jacknife.
+\newblock \emph{Annals of Statistics}, 7: 1--26
+
+\bibitem[{Fatoye et~al.(2022)Fatoye, Gebrye, Mbada, Fatoye, Makinde, Ayomide,
+  and Ige}]{fatoye2022britJournalPain}
+\textbf{Fatoye, F.}, \textbf{Gebrye, T.}, \textbf{Mbada, C.E.}, \textbf{Fatoye,
+  C.T.}, \textbf{Makinde, M.O.}, \textbf{Ayomide, S.}, and \textbf{Ige, B.}
+  (2022).
+\newblock Cost effectiveness of virtual reality game compared to clinic based
+  mckenzie extension therapy for chronic non-specific low back pain.
+\newblock \emph{British Journal of Pain}, 16(6): 601--609.
+\newblock \doi{10.1177/20494637221109108}
+
+\bibitem[{Hall(1992)}]{Hall1992Book}
+\textbf{Hall, P.} (1992).
+\newblock \emph{The bootstrap and Edegeworth expansion}.
+\newblock Springer
+
+\bibitem[{Hall(1990)}]{hall1990AoProb}
+\textbf{Hall, P.} (1990).
+\newblock Asymptotic properties of the bootstrap for heavy-tailed
+  distributions.
+\newblock \emph{The Annals of Probability}, 18(3): 1342--1360.
+\newblock ISSN 00911798
+
+\bibitem[{Hall and Yao(2003)}]{hallYao2003econometrica}
+\textbf{Hall, P.} and \textbf{Yao, Q.} (2003).
+\newblock Inference in arch and garch models with heavy-tailed errors.
+\newblock \emph{Econometrica}, 71(1): 285--317.
+\newblock ISSN 00129682, 14680262
+
+\bibitem[{Hardle and Mammen(1993)}]{hardleMammen1993AoS}
+\textbf{Hardle, W.} and \textbf{Mammen, E.} (1993).
+\newblock {Comparing Nonparametric Versus Parametric Regression Fits}.
+\newblock \emph{The Annals of Statistics}, 21(4): 1926 -- 1947.
+\newblock \doi{10.1214/aos/1176349403}
+
+\bibitem[{Hill(1975)}]{hill1975aos}
+\textbf{Hill, B.M.} (1975).
+\newblock A simple general approach to inference about the tail of a
+  distribution.
+\newblock \emph{The Annals of Statistics}, 3(5): 1163--1174.
+\newblock ISSN 00905364
+
+\bibitem[{Ho and Imai(2006)}]{hoImai2006jasa}
+\textbf{Ho, D.E.} and \textbf{Imai, K.} (2006).
+\newblock Randomization inference with natural experiments.
+\newblock \emph{Journal of the American Statistical Association}, 101(475):
+  888--900.
+\newblock \doi{10.1198/016214505000001258}
+
+\bibitem[{Imbens and Rosenbaum(2005)}]{imbensRosenbaum2005jrssc}
+\textbf{Imbens, G.W.} and \textbf{Rosenbaum, P.R.} (2005).
+\newblock Robust, accurate confidence intervals with a weak instrument: Quarter
+  of birth and education.
+\newblock \emph{Journal of the Royal Statistical Society. Series A (Statistics
+  in Society)}, 168(1): 109--126.
+\newblock ISSN 09641998, 1467985X
+
+\bibitem[{Jenkins(2017)}]{jenkins2017economica}
+\textbf{Jenkins, S.P.} (2017).
+\newblock Pareto models, top incomes and recent trends in uk income inequality.
+\newblock \emph{Economica}, 84(334): 261--289
+
+\bibitem[{Jones et~al.(2014)Jones, Lomas, and
+  Rice}]{jonesLomasRice2014jappliedEconometrics}
+\textbf{Jones, A.M.}, \textbf{Lomas, J.}, and \textbf{Rice, N.} (2014).
+\newblock Applying beta-type size distributions to healthcare cost regressions.
+\newblock \emph{Journal of Applied Econometrics}, 29(4): 649--670
+
+\bibitem[{Kumar(2017)}]{kumar2017internationalJournalSystemAssurance}
+\textbf{Kumar, D.} (2017).
+\newblock The {Singh}–{Maddala} distribution: properties and estimation.
+\newblock \emph{International Journal of System Assurance Engineering and
+  Management}, 8(2): 1297--1311
+
+\bibitem[{Liu(1988)}]{liu1988AoS}
+\textbf{Liu, R.Y.} (1988).
+\newblock Bootstrap procedures under some non-i.i.d. models.
+\newblock \emph{The Annals of Statistics}, 16(4): 1696--1708.
+\newblock ISSN 00905364
+
+\bibitem[{MacKinnon and Webb(2020)}]{macKinnonWebb2020joe}
+\textbf{MacKinnon, J.G.} and \textbf{Webb, M.D.} (2020).
+\newblock Randomization inference for difference-in-differences with few
+  treated clusters.
+\newblock \emph{Journal of Econometrics}, 218(2): 435--450.
+\newblock ISSN 0304-4076.
+\newblock \doi{https://doi.org/10.1016/j.jeconom.2020.04.024}
+
+\bibitem[{Mammen(1993)}]{mammen1993AoS}
+\textbf{Mammen, E.} (1993).
+\newblock {Bootstrap and Wild Bootstrap for High Dimensional Linear Models}.
+\newblock \emph{The Annals of Statistics}, 21(1): 255 -- 285.
+\newblock \doi{10.1214/aos/1176349025}
+
+\bibitem[{Mandelbrot(1963)}]{mandelbrot1963jpe}
+\textbf{Mandelbrot, B.} (1963).
+\newblock New methods in statistical economics.
+\newblock \emph{Journal of Political Economy}, 71(5): 421--440
+
+\bibitem[{Nixon et~al.(2010)Nixon, Wonderling, and
+  Grieve}]{NixonWonderlingGrieve2010HealthEconomics}
+\textbf{Nixon, R.}, \textbf{Wonderling, D.}, and \textbf{Grieve, R.} (2010).
+\newblock Non-parametric methods for cost-effectiveness analysis: The central
+  limit theorem and the bootstrap compared.
+\newblock \emph{Health Economics}, 19: 316--333
+
+\bibitem[{Orme(1990)}]{Orme90}
+\textbf{Orme, C.} (1990).
+\newblock The small sample performance of the information matrix test.
+\newblock \emph{Journal of Econometrics}, 46: 309--331
+
+\bibitem[{Politis and Romano(1994)}]{politisRomano1994AoS}
+\textbf{Politis, D.N.} and \textbf{Romano, J.P.} (1994).
+\newblock {Large Sample Confidence Regions Based on Subsamples under Minimal
+  Assumptions}.
+\newblock \emph{The Annals of Statistics}, 22(4): 2031 -- 2050.
+\newblock \doi{10.1214/aos/1176325770}
+
+\bibitem[{Romano and Wolf(1999)}]{romanoWolf1999metrika}
+\textbf{Romano, J.P.} and \textbf{Wolf, M.} (1999).
+\newblock Subsampling inference for the mean in the heavy-tailed case.
+\newblock \emph{Metrika}, 50(1): 55--69.
+\newblock \doi{10.1007/s001840050035}
+
+\bibitem[{Schluter and Trede(2002)}]{schluterTrede2002joe}
+\textbf{Schluter, C.} and \textbf{Trede, M.} (2002).
+\newblock Tails of lorenz curves.
+\newblock \emph{Journal of Econometrics}, 109(1): 151--166
+
+\bibitem[{Singh and Maddala(1976)}]{singhMaddala1976econometrica}
+\textbf{Singh, S.K.} and \textbf{Maddala, G.S.} (1976).
+\newblock A function for size distribution of incomes.
+\newblock \emph{Econometrica}, 44(5): 963--970
+
+\bibitem[{Tsiplova et~al.(2022)Tsiplova, Jegathisawaran, Mirenda, Kalynchuk,
+  Colozzo, Smith, and Ungar}]{tsiplova2022researchAutism}
+\textbf{Tsiplova, K.}, \textbf{Jegathisawaran, J.}, \textbf{Mirenda, P.},
+  \textbf{Kalynchuk, K.}, \textbf{Colozzo, P.}, \textbf{Smith, V.}, and
+  \textbf{Ungar, W.J.} (2022).
+\newblock Parent coaching intervention for children with suspected autism
+  spectrum disorder: Cost analysis.
+\newblock \emph{Research in Autism Spectrum Disorders}, 93: 101949.
+\newblock ISSN 1750-9467
+
+\bibitem[{Wu(1986)}]{Wu1986AoS}
+\textbf{Wu, C.F.J.} (1986).
+\newblock Jackknife, bootstrap and other resampling methods in regression
+  analysis.
+\newblock \emph{The Annals of Statistics}, 14(4): 1261--1295.
+\newblock ISSN 00905364
+
+\bibitem[{Zipf(1949)}]{zipf1949book}
+\textbf{Zipf, G.K.} (1949).
+\newblock \emph{Human behavior and the principle of least effort}.
+\newblock Addison-Wesley Press
+
+\end{thebibliography}

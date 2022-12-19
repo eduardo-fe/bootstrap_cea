@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2021)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main_v10v3.aux
+The style file: experiment.bst
+Database file #1: bibFinalv3.bib
+Warning--empty title in CattaneoFrandsenTitiunik2015jcausalInference
+You've used 38 entries,
+            2898 wiz_defined-function locations,
+            873 strings with 11940 characters,
+and the built_in function-call counts, 23846 in all, are:
+= -- 1856
+> -- 810
+< -- 28
++ -- 313
+- -- 258
+* -- 1852
+:= -- 3469
+add.period$ -- 100
+call.type$ -- 38
+change.case$ -- 273
+chr.to.int$ -- 37
+cite$ -- 39
+duplicate$ -- 1946
+empty$ -- 1983
+format.name$ -- 368
+if$ -- 4705
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 418
+newline$ -- 221
+num.names$ -- 152
+pop$ -- 748
+preamble$ -- 1
+purify$ -- 238
+quote$ -- 0
+skip$ -- 584
+stack$ -- 0
+substring$ -- 1263
+swap$ -- 1100
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 333
+warning$ -- 1
+while$ -- 165
+width$ -- 0
+write$ -- 544
+(There was 1 warning)

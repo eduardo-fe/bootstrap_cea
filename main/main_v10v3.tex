@@ -1,0 +1,383 @@
+ \documentclass[english, 11pt,a4paper, ]{article}
+ \usepackage{amssymb}
+ \usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{amsmath} %Optional if you use mathtools, above.
+\usepackage{geometry}
+\geometry{
+    left=1in,
+    right=1in,
+    top=1in,
+    bottom=1in
+}
+
+ \usepackage{setspace}
+ \usepackage{enumerate}
+ \usepackage{babel}
+\usepackage{rotating}
+ \usepackage{natbib}
+ \usepackage{verbatim}
+ \usepackage{comment} %To insert comments without having to use %
+ \usepackage{authblk} %When you have several authors (with different institutions.)
+ \usepackage{pgfplots}
+ \usepackage{filecontents}
+ \usepackage{threeparttable} %for footnotes in tables
+% \usepackage{wordlike} %cannot use with "geometry"
+ \pgfplotsset{width=12cm,compat=1.6} %plots things using tikz
+ \usetikzlibrary{positioning} % To rotate text in TiKz
+ \usepgfplotslibrary{groupplots} % LATEX and plain TEX
+ \usetikzlibrary{pgfplots.groupplots}
+
+
+\usepackage[margin=1cm,font=small,labelfont=bf,labelsep=colon]{caption}
+\usepackage[rounding]{rccol}
+
+ \newtheorem{theorem}{Theorem}
+ \newtheorem{definition}[theorem]{Definition}
+ \newtheorem{proposition}[theorem]{Proposition}
+% \DeclareMathOperator*{\argmax}{arg\,max}
+ \newenvironment{proof}[1][Proof]{\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+
+% \renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+
+
+\newcommand{\pot}[2]{Y_{#1}(#2)}
+
+\begin{document}
+%\doublespacing
+\onehalfspacing
+%+Title
+\title{Inference in Medical Cost Effectiveness Analysis with Heavy Tail Data.}
+
+
+\author[1]{Eduardo F\'e\footnote{Correspondence to: eduardo.fe@manchester.ac.uk}}
+\author[2]{Simon Peters}
+ 
+
+\affil[1]{\textit{Department of Social Statistics, University of Manchester, U.K.}}
+\affil[2]{\textit{Department of Economics, University of Manchester, U.K.}}
+ 
+
+
+
+\maketitle
+\begin{abstract}
+%The bootstrap appears to be aseem well suited to perform accurate inference Random samples from randomized experiments A random sample drawn from a population would appear to offer an ideal opportunity
+%	to use the bootstrap in order to perform accurate inference, since the observations of
+%	the sample are IID. In this paper, Monte Carlo results suggest that bootstrapping a
+%	commonly used index of inequality leads to inference that is not accurate even in very
+%	large samples, although inference with poverty indices is satisfactory. We find that the
+%	major cause is the extreme sensitivity of many inequality indices to the exact nature
+%	of the upper tail of the income distribution. This leads us to study two non-standard
+%	bootstraps, the m out of n bootstrap, which is valid in some situations where the
+%	standard bootstrap fails, and a bootstrap in which the upper tail is modelled parametrically. Monte Carlo results suggest that accurate inference can be achieved with this
+%	last method in moderately large samples.
+\end{abstract}
+\newpage
+\section{Introduction}
+
+Cost-effectiveness analysis is a critical step in the evaluation and adoption of medical innovations and policies. National and international health agencies advocate its use, and  in some cases, such as the U.K. National Institute for Health and Care Excellence (NICE), recommendations are explicitly issued on the basis of \textit{both} clinical and economic evidence. The Incremental Cost Effectiveness Ratio (ICER) and the associated Incremental Net Benefit (INB) are the two principal nonparametric statistics employed to evaluate the economic efficiency of new medical interventions and technologies\footnote{For example, at the time of writing in December 2022, PubMed.gov returns 1539 articles including the term Incremental Net Benefit or Cost Effectiveness Ratio for 2022 alone.}. To ensure that estimates of ICER/INB are not due to pure chance, confidence interval and tests statistics need to be calculated. As is generally the case, the exact distributions of the ICER /INB are elusive, because they depend on the unknown probabilistic process that generated the data. Two solutions have been studied to solve this problem: asymptotic approximations (valid as the sample size converges to infinity) and the bootstrap. 
+
+When the distribution of the ICER/INB has finite first two moments, the asymptotic distribution of ICER/INB follows from the central limit theorem. The asymptotic distribution of INB, in particular, is a non-degenerate stable distribution with finite moments (a normal distribution), from which approximate quantiles are simple to obtain. Aside from its simplicity, if the underlying data generating process is normal, then asymptotic approximations will yield confidence intervals with good coverage and tests with empirical sizes close to the nominal level. May be because of these reasons, the cost-effectiveness literature, authors have favoured asymptotic approximations (see, for example, \citealp{NixonWonderlingGrieve2010HealthEconomics} or recent examples by \citealp{benEtal2022ejhe}, \citealp{fatoye2022britJournalPain}; \citealp{tsiplova2022researchAutism}). When samples are finite and the underlying data are not normally distributed, however, asymptotic approximations can be crude, in general. This has led researchers to base statistical inference on bootstrap methods (\citealp{Efron1979AoS}). When the  distribution of a statistic has finite first two moments, and the statistic is a (asymptotic) pivot,  bootstrap inference has been shown to be superior to asymptotic inference in finite samples.  In a latter section, we replicate these findings, showing that the studentized version of the INB is a pivot and, as such, inference based on the bootstrap results in confidence intervals with superior coverage and tests with less size distortion. 
+
+Both asymptotic methods and the standard bootstrap work under the assumption that a given statistic follows a stable distribution with finite first and second moments. In  cost-effectiveness analysis, however, this assumption is problematic. As noted by \cite{jonesLomasRice2014jappliedEconometrics}, cost data (and economic data more generally) tends to exhibit  heavy tails\footnote{Often accompanied by right-hand skewness. Note that the heaviness of the tail of a distribution determines the rate of decay of probabilities away from the mean, and it does not imply skewness. Similarly, skewed distributions does not necessarily have heavy tails -the log normal and gamma distributions being two examples of this. Extreme skewness is a feature of secondary importance that one would expect to see in variables that have a heavy tail and are non-negative.}. This empirical regularity was first remarked by Vilfredo Pareto in the late 1800s. Specifically, he pointed that the proportion of individuals with income exceeding a level $u$ can be described by a scaling distribution,  $P(u)\sim Cu^{-k}$, for a constant $C$ and a parameter  $k$ known as the \textit{index of stability} and which accounts for the rate of decay away from the center of the distribution\footnote{Following Pareto's observation, work by \cite{zipf1949book}, \cite{mandelbrot1963jpe}, \cite{singhMaddala1976econometrica} and others provided further theoretical justification for this idea and, in recent times, authors have shown the adequacy of scaling, heavy tail distributions to fit economic data (\citealp{kumar2017internationalJournalSystemAssurance}; \citealp{jenkins2017economica}; \citealp{schluterTrede2002joe}).}. In the cost-effectiveness literature, this is mirrored in the stylised fact that small proportions of individuals tend to account for a very large proportion of medical costs. When a variable has a scaling distribution with heavy tails, either   $1\leq k <2 $ (implying that $E|U^2|)\rightarrow\infty$) or $0\leq k <1 $ (in which case $E|U|\rightarrow\infty$ as well).  Aside from violating the assumptions of the central limit theorem, variables with heavy tails exhibit extreme outlying observations, and these are known to present particular challenges to the standard bootstrap. The bootstrap distribution of a normalised sum of infinite variance random variables tends to a random distribution, and this lead to a failure of standard bootstrap methods (e.g. \citealp{athreya1987aos}; \citealp{hall1990AoProb}).From an empirical perspective,  the standard bootstrap is based on an  i.i.d. random resampling with  replacement scheme. The probability of any element of the original sample not featuring in the bootstrap sample approaches\footnote{The probability of not observing element $i$ in a random sampling with replacement from $i=1... n$ distinct observations is $n-1/n$, and $e=\lim_{n\rightarrow\infty}((n+1)/n)^n$. } $((n-1)/n)^{n}\rightarrow 1/e$= 0.3679 as the sample size goes to infinity. Outlying observations will be regularly missed in bootstrap samples, and this will result in biased inferences, through under-representation of the variation in the data.  
+
+Several alternative bootstrap designs have been proposed for inference with heavy tails. \cite{politisRomano1994AoS} and \cite{romanoWolf1999metrika} proposed an m-out-of-n bootstrap based on sub-samples of size $m<n $. This scheme consistently estimates the true asymptotic distribution of a sample mean. However, \cite{hallYao2003econometrica} note that subsampling can return very conservative confidence intervals. Further, results in \cite{davidsonFlachaire2007joe} and \cite{corneaDavidson2015et} suggest the existence of an optimal  $m/n$, with performance deteriorating as $m$ departs from the optimal choice. These latter papers present semi-/parametric bootstrap methods that improve on resampling designs, but which require structural assumptions about some aspects of the distribution of the statistic. 
+
+ \cite{cavaliere2013econometricreviews}, propose a wild bootstrap method for inferences about a mean in the infinite variance case.  The wild bootstrap (\citealp{Wu1986AoS}, \citealp{liu1988AoS}), has been  shown to provide refinements for inference in various settings, including linear models with heteroskedastic errors (\citealp{davidsonFlachaire2008joe}), high-dimensional linear models (\citealp{mammen1993AoS}) consistent nonparametric testing (\citealp{hardleMammen1993AoS}), and linear models with clustered errors (\citealp{cameronGelbachMiller2008REStats}; \citealp{djogbenouMacKinnonMorten2019joe}). \cite{cavaliere2013econometricreviews} show that their scheme delivers consistent estimation of the asymptotic distribution of the sample mean, conditional on $\left\{ |X_i-E(X_i)|\right\}_{i=1}^n$. The latter ensures that resampling preserves the sample extremes and, as a result, it improves the coverage of confidence intervals and reduces the size distortion of tests of hyptheses. Unlike subsampling methods, the wild bootstrap sets $m=n$ so that all information is used to compute the bootstrap distribution and there is not need to find and optimal resampling ratio $m/n$. Unlike semi/parametric bootstrap methods, researchers do not need to estimate the index of stability $k$. 
+
+ In this paper, we study inference about INB under heavy tails, using asymptotic approximations, the standard bootstrap and the wild bootstrap in  \cite{cavaliere2013econometricreviews}. However, cost-effectiveness analysis in medical research typically follows a randomized experiment, with the randomization distribution being often known a priori. This opens the possibility of implementing randomization inference for the INB ratio. Specifically, knowledge of the randomization distribution enables us to obtain the finite sample distribution of the INB under the null hypothesis  $H_0:INB=inb^*$, for any $inb^*$. Consequently, one can undertake exact finite sample inferences about the INB, without any assumption beyond our knowledge of the randomization distribution of treatment. Randomization Inference has been shown to provide tests with almost-nominal size and confidence intervals with correct coverage in a wide variety of settings (\citealp{CattaneoFrandsenTitiunik2015jcausalInference}; \citealp{hoImai2006jasa}; \citealp{imbensRosenbaum2005jrssc}; \citealp{macKinnonWebb2020joe}). Below we explore if its promise survives the heavy tail scenario, and evaluate its relative performance against the other inferential methods. 
+
+
+
+
+
+
+
+
+
+%In the cost-effectiveness literature, the standard or \textit{i.i.d.} bootstrap has been studied by \cite{NixonWonderlingGrieve2010HealthEconomics}. These authors present the asymptotic distribution of the INB and compare the performance of asymptotic confidence intervals and standard bootstrap confidence intervals\footnote{Their simulations show that the standard bootstrap and asymptotic confidence intervals perform similarly. This result is explained because they used a non-standarized version of the INB statistics, which is not a pivot. We show later in the paper, that even the most basic form of the bootstrap can deliver improvement over the asymptotic distribution if it is applied to an appropriate pivot statistic.}. The \textit{i.i.d.} bootstrap delivers optimal performance when data come from a population of independent, identically distributed 
+
+%In this note we show  that  `studentizing' the INB results in an asymptotic pivot quantity that provides asymptotic refinements, and we  provide some supporting Monte Carlo simulation and revisit the experiment in  \cite{NixonWonderlingGrieve2010HealthEconomics}.
+
+ 
+
+
+\section{Cost-Benefit Statistics. }
+Consider a randomized trial  designed to assess the cost-effectiveness of a new policy, technology or medical innovation. Let $Z_i\in\left\{0,1\right\}$, $i=1,...,n$ denote  person's $i$ treatment status (with 0 denoting assignment to the control group). Assignment is randomized, so that, for any random variable $W$, $E(W|Z)=E(W)$. Cost and benefit data are collected for each participant. Specifically, let $C_i(z)$, $B_i(z)$ be the potential cost and benefit of person $i$ under assignment $z\in\left\{0,1\right\}$. This notation assumes Stable Unit Treatment Value Assumption. Researchers then observe 
+\begin{align}
+	C_i&=C_i(1)\cdot Z_i + C_i(0)\cdot (1-Z_i) \\
+	B_i&=B_i(1)\cdot Z_i + B_i(0)\cdot (1-Z_i)
+\end{align}
+A new technology is considered to be cost-effective if the estimated Incremental Cost Effectiveness Ratio, ICER, satisfies,
+\begin{align}
+	ICER =\dfrac{E(C(1)-C(0))}{E(B(1)-B(0))}=\dfrac{E(C_i|Z_i=1)-E(C_i|Z_i=0)}{E(B_i|Z_i=1)-E(B_i|Z_i=0)} \leq K
+\end{align}
+%\begin{equation}
+%ICER=\left(\bar{C}_1  -\bar{C}_0 \right) / \left(\bar{B}_1  -\bar{B}_0 \right) \leq K
+%\end{equation}
+where the second equality follows from random assignment of $Z$. The quantity $ K $ is a known constant,  and represents the policymaker's willingness to pay for the innovation. This is normally fixed beforehand, by a decision-taker. A potential weakness of the ICER is that denominator is unrestricted, and can thus equal (or approach) zero if an innovation does not yield any benefits. As a result, the ICER could be unstable and elusive for estimation methods.  In practice, researchers work with the equivalent Incremental Net Benefit, INB, 
+\begin{align}
+	INB &=  K\cdot E(B(1)-B(0)) - E(C(1)-C(0))  \nonumber \\
+&= K\cdot \left[ E(B_i|Z_i=1)-E(B_i|Z_i=0)\right] - \left[E(C_i|Z_i=1)-E(C_i|Z_i=0)\right] 
+\end{align}
+ Let $\sigma^2_{W_z} = V(W_z)$ be the variance of $W$ under assignment $z\in\left\{0,1\right\}$, which under random assignment equals $V(W_i|Z_i=z)$.  Similarly, let $cov(C_i(z),B_i(z))$ be the covariance of cost and benefit under assignment $z$, which once again equals its conditional version under random assignment. Then, it is straightforward to show that the variance of INB is given by:
+\begin{equation}
+\Sigma= K^2\cdot(\sigma^2_{B_1} + \sigma^2_{B_0}) + (\sigma^2_{C_1} + \sigma^2_{C_0}) -2\cdot K\cdot(cov(C_1,B_1) + cov(C_0,B_0)).
+\end{equation}
+Define the sample averages,
+\begin{align}
+	\bar{C}_1=\dfrac{\sum_{i=1}^n C_i \cdot Z_i}{\sum_{i=1}^n \cdot Z_i} \text{ and } \bar{C}_0=\dfrac{\sum_{i=1}^n C_i \cdot (1-Z_i)}{\sum_{i=1}^n \cdot (1-Z_i)}
+\end{align}
+with $\bar{B}_0 $, $\bar{B}_1$ defined similarly. It follows directly from random assignment of $Z_i$ and a law of large numbers that, if $C_i(z), B_i(z)$ have finite first moments, then these sample means estimate their population counterparts, $E(C(z)), E(B(z))$. Similar,
+\begin{align}
+	\hat{\sigma}^2_{C_1}=\dfrac{\sum_{i=1}^N \left(C_i \cdot Z_i - \bar{C}_1\right)^2}{{\sum_{i=1}^n \cdot Z_i} }
+\end{align}
+is a consistent estimator of $\sigma^2_{C_1}$ (and similar estimators can be defined for the remaining variances and covariances). The latter also requires $E(C_i(z)^2)<\infty$, $E(B_i(z)^2)<\infty$. The INB and its variance can thus be estimated with   
+\begin{eqnarray}
+\widehat{INB} &=&  K(\bar{B}_1-\bar{B}_0) - (\bar{C}_1-\bar{C}_0)   >0  \\
+\hat{\Sigma}&=& K^2(\hat{\sigma}^2_{B_1} + \hat{\sigma}^2_{B_0}) + (\hat{\sigma}^2_{C_1} + \hat{\sigma}^2_{C_0}) -2K(\widehat{cov}(C_1,B_1) + \widehat{cov}(C_0,B_0)).
+\end{eqnarray}
+We want to construct a confidence interval for INB using
+\begin{equation}
+Prob(a\leq \widehat{INB}-INB\leq b|F) = 1- 2\alpha.
+\end{equation}
+for a pre-specified significance level $ \alpha $ and where $ F $ is the distribution of the data. $ F $ is not known and this precludes us from computing the constants $a$ and $b$. However,  $ \widehat{INB} $ is a linear combination of sample means. Therefore, the central limit theorem can be applied to obtain a large sample ($ N\rightarrow\infty $) approximation for its distribution. In particular, under the assumption of finite first two moments of $C(z), B(z)$, we have
+\begin{eqnarray}
+\sqrt{N}\cdot (\widehat{INB}-INB)\xrightarrow{d} N(0, \Sigma)
+\end{eqnarray}
+and the continuous mapping theorem then yields the \textit{studentized} $ \widehat{INB} $, 
+\begin{align}
+	\hat{\tau}=\sqrt{N}\cdot (\widehat{INB}-INB)/\sqrt{\hat{\Sigma}} \xrightarrow{d}N(0,1)	
+\end{align}
+from which we can now derive the quantities $a,b$. Critically, $\hat{\tau}$ does not depend on unknown quantities and is, therefore, an asymptotic pivot\footnote{It is convenient to remark here that the success of the bootstrap methods that we consider below depends on how well it approximates the distribution of $ \widehat{INB}-INB $.
+This depends on four factors: simulation error, statistical error, the ability of the bootstrap algorithm to reproduce the true data generating process and the \textit{pivotal} nature of the underlying statistic.
+Of these factors, the last is germane to the question of when the bootstrap works. Specifically, the distribution of $ \widehat{INB}-INB $ depends on unknown quantities, which  need to be estimated,  thus introducing a systematic discrepancy between the
+estimated and true distributions (in the Normal case this means that $ N(\hat{\mu}, \hat{\sigma}^2) \neq N(\mu, \sigma^2) $ even
+though both distributions might be close to each other if $ \hat{\mu}, \hat{\sigma}^2 $ are consistent estimators). When working with a pivot this problem is avoided.}. Tests of the null hypothesis $H_0: INB =0$ can be based on $\hat{\tau}$. The null hypothesis would be rejected whenever the p-value $p(\hat{\tau})=1-F(\hat{\tau})$ falls below a pre-specified significance level, $\alpha$. The unknown cumulative distribution function of $\hat{\tau}$ under the null hypothesis, $F(.)$, can be replaced with the asymptotic distribution, and this is the standard approach in the cost-effectiveness literature. In that case, p-values follow from the quantiles of the standard normal distribution. A more successful approach, however, is to use Monte Carlo methods to approximate $F(.)$, as we now discuss.
+
+
+
+%A  statistic is a (asymptotic) pivot if its (asymptotic) distribution does not depend on unknown parameters.For instance, if $ X_i\sim N(\mu, \sigma^2) $, then $ \sqrt{N}.(\bar{X}-\mu)\sim N(0, \sigma^2) $ exactly, but $ \bar{X} $ is not a pivotal quantity because it depends on $ \mu $ and $ \sigma^2 $. However, the \textit{studentized} mean, $ Z=\sqrt{N}.(\bar{X}-\mu)/\sigma \sim N(0,1)$,has a distribution that does not depend on any unknown quantities, so $ Z $ is a pivotal quantity. Similarly, $ \sqrt{N}.(\widehat{INB}-INB)\xrightarrow{d} N(0,\Sigma) $ and therefore this is not an asymptotic pivot.Following from the continuous mapping theorem, the \textit{studentized} $ \widehat{INB} $, $ \sqrt{N}.(\widehat{INB}-INB)/\sqrt{\hat{\Sigma}} \xrightarrow{d}N(0,1)$ and, therefore, the studentized $ \widehat{INB} $ is an asymptotic pivot. This distinction  is crucial.
+
+
+\section{Bootstrap and Randomization Inference}
+Bootstrap methods rely on the principle that a sample contains all (relevant) available information about the distribution $F$ of a statistic. Under this principle, the standard bootstrap in \cite{Efron1979AoS}, relies on $B$ samples of size $n$, each obtained by sampling with replacement from the original data. The sequence $\left\{\tau^*_b\right\}_{b=1}^B$ of standard boostrap INB estimates of $\tau$ then has the ability to mimic the finite sample variation of the statistic $\hat{\tau}$and, as a result, the empirical distribution of the $\tau^*_b$, say $\hat{F}^*$, serves as an approximation to $F$. Because $B$ can be made arbitrarily large, any error due to simulation can be virtually eliminated. It follows that 
+\begin{align}
+	\hat{p}^* = 1- \hat{F}^*(\hat{\tau})= \frac{1}{B}\sum_{b=1}^B I(\tau^*_b>\hat{\tau})
+\end{align}
+is a valid p-value for a one-sided test of the null hypothesis $H_0:INB=0$ against $H_a:INB >0$ whereas a two-sided test can be evaluated with
+\begin{align}
+	\hat{p}^* = 2 \min\left(\frac{1}{B}\sum_{b=1}^B I(\tau^*_b\leq \hat{\tau}), \frac{1}{B}\sum_{b=1}^B I(\tau^*_b>\hat{\tau})  \right)
+\end{align}
+We can compute confidence intervals similarly (e.g. the lower bound for a confidence interval with significance level $\alpha$ corresponds to the $\alpha \cdot (B+1)/2$ quantile of the standard bootstrap distribution $\hat{F}^*$). When INB has finite moments, inference based on the standard bootstrap distribution of $\hat{F}^*$ will yield asymptotic refinements because $\hat{\tau}$ is a pivot.\footnote{Specifically, if a pivot statistic has an exact distribution $G$ and a standard normal asymptotic distribution, $\Phi$, then the error in the bootstrap approximation to $G$ vanishes at rate $n^{-1}$ (in probability), whereas the error in the asymptotic approximation does so slower, at rate $n^{-1/2}$, where $n$ is the sample size. If the statistic, however, is not a pivot, then the error in the bootstrap approximation is also of order $n^{-1/2}$. See \cite{beran1988AoS} \cite{Hall1992Book} and \cite{DavidsonHinkley1997Book} for theoretical demonstrations of this result. For empirical demonstrations, \cite{Orme90}; \cite{davidsonFlachaire2007joe}; \cite{CameronGelbachMiller2008REStat}; 
+\cite{bugni2010econometrica}, constitute a few early representative examples in a variety of fields.}. On the contrary, working with $\hat{INB}$ will fail to improve on asymptotic methods. 
+
+Overall, the performance of any bootstrap scheme is determined by how well it can replicate the key features of the process that generated the data and which  most affect $\hat{\tau}$. The standard bootstrap relies on the existence of finite first two moments, but data exhibiting heavy tails violate this premise: we already noted in the introduction that the bootstrap distribution of a normalised sum of infinite variance random variables tends to a random distribution, and this leads to a failure of the stadndard bootstrap. The INB is a linear combination of sums of random variables, so it will be vulnerable to the heavy tail problem. For example, if data come from a Pareto distribution, the INB will also be Pareto distributed, also with heavy tails. The latter can be shown numerically. Table \ref{table:Hill_estimate}  presents the \cite{hill1975aos} estimate\footnote{Hill's estimator is  
+\begin{align}
+	\hat{k}= \left[q^{-1}\sum_{i=0}^{q-1} \log INB_{(n-i)}-\log INB_{(n-q+1)} \right]^{-1}
+\end{align}
+where $INB_{(j)}$ is the $j^{th}$ ordered value of the simulated INB, and $q$ determines the largest ordered statistic to use in the estimation. } of the stability index of INB when $C(z), B(z)$ are Pareto distributed with minimum value 1 and under a range of values of $k$. For $k<1.7$, the INB inherits the heavy tail property from the data and is Pareto distributed with infinite variance. This implies that the standard bootstrap will also fail in these situations.
+%full data at the end.
+\begin{table}
+	\centering
+	\scriptsize
+	\begin{tabular}{lccccccccc}
+		\hline \hline \\
+		&\multicolumn{9}{c}{$k$} \\
+		\cline{2-10}\\
+		& 0.1 &0.5& 1 &1.5& 1.6&1.7&1.8&1.9&2 \\ \cline{2-10}\\
+		Stability Index  & 0.097209&0.48111&1.0151&1.6535&1.8367& 2.0941&2.3388&2.4963&2.7310 \\
+		of INB&\\
+		\hline \hline \\
+	\end{tabular}
+	\caption{Hill estimates of the stability index of INB when all $C(z)$, $B(z)$ follow a Pareto distribution with minimum $1$ and stability index $k$. Based on 100,000 draws of size $2000$.}
+	\label{table:Hill_estimate}
+\end{table}
+
+\cite{cavaliere2013econometricreviews} have proposed a wild bootstrap method that provides excellent inference for the sample mean in the infinite variance case. Given a sample of variables $X_i$, instead of resampling with replacement from the data, bootstrap samples are based on 
+\begin{align} 
+X_i^* = \bar{X} + (X_i - q(X))\cdot w_i \text{ for }i=1,...,n
+\end{align}
+where $q(X)$ is a centrality measure: either the sample mean of $X$ or if data are heaviliy skweded, the median of $X$. The term $w_i$ is a sequence of i.i.d. random variables with $E(w_i)=0$ and $E(w_i^2)=1$. There are various choices for the distribution of $w_i$ in the literature, however the Rademacher distribution (which takes value 1 or -1 with probability 0.5 each) has been proved to deliver the best performance (\citealp{davidsonFlachaire2008joe}). Intuitively, the above resampling scheme takes into account the variation of data around the median, thus being able to characterise the tails of the distribution of the mean. Interestingly, \cite{cavaliere2013econometricreviews} prove that the above bootstrap scheme works also for situations when the data do not have a finite mean or a finite variance.                                            
+
+\subsection{Randomization Inference.}
+
+ In recent times, Fisher's Randomization Inference has gained popularity, due to its ability to yield exact tests which are robust to a variety of statistical problems (REFS). Randomization inference is particularly appealing in settings where treatment is unconfounded, such as the controlled experiments preceding cost-effectiveness analysis. 
+ Consider the sharp null hypothesis that the new medical innovation is not cost-effective. Formally, this can be written as 
+ \begin{align}
+	H_0: K\cdot B_i(1) - C_i(1) = K\cdot B_i(0)-B_i(0) \text{ for all }i=1,...,n
+ \end{align}
+ Under the above null, we can impute each treated (control) unit her/his missing INB under control (treatment respectively). That is, for a unit $i$ with $Z_i=1$, under the above sharp null, $K\cdot B(0)-C(0)=K\cdot B_i -C_i$ (and similarly for a unit with $Z_i=0$). Further, in a controlled randomized experiment, the distribution of the treatment assignment is known. The latter then implies that we can study the variation of any statistics (such as INB or $\hat{\tau}$ under) 'all' possible  $\binom{n}{n_1}$ permutations of the observed treatment assignment, $\mathbf{Z}=(Z_1,Z_2,...,Z_n)$, where $n_1$ is the number of 'treated' units (which is determined a priori in randomized experiments). As a result, the null randomization distribution of these statistics is known, and they can be used construct a test of the above\textit{sharp} null hypothesis.
+ 
+ In practice, even with moderate $n$, the number of possible permutations of $\mathbf{Z}$ is too large to consider, so researchers consider only a random selection, $R$, of all possible permutations. Strictly speaking, the ensuing tests will be approximately exact, but as with the bootstrap researchers can reduce the approximation error by selecting a large enough  $R$. Thus, to construct a randomization inference test for INB, we can follow this algorithm,
+
+ \begin{enumerate}
+	\item Calculate the  standardized INB, $\hat{\tau}$
+	\item Repeat the following $r=1,...,R$ times:
+	\begin{enumerate}
+		\item Draw a permutation, $\tilde{\mathbf{Z}}_r$ of the original assignment vector $\mathbf{Z}$.
+		\item Compute $\hat{\tau}$ given $\tilde{\mathbf{Z}}$, say $\hat{\tau}(\tilde{\mathbf{Z}}_r)$
+	\end{enumerate}
+	\item Compare the observed $\hat{\tau}$ to its null distribution, to obtain the p-value for a one-sided tests: 
+	\begin{align}
+		p \approxeq R^{-1}\cdot \sum_{r=1}^R \mathbb{I}(\hat{\tau}(\tilde{\mathbf{Z}}_r)>\hat{\tau})
+	\end{align}
+ \end{enumerate}
+ 
+
+
+\section{Monte Carlo.}
+
+We illustrate the above discussion through two  experiments. In the first instance, we drew data from a set of four standard distributions and computed asymptotic and bootstrap  confidence intervals for the population mean.
+In the second instance, we estimated confidence intervals for the  
+INB statistic. This second experiment is based on the design by \cite{NixonWonderlingGrieve2010HealthEconomics}. We calculated asymptotic confidence intervals and bootstrap confidence intervals based ($ B=199 $ resamples) on the raw statistics and their studentized versions. We consider samples sizes of $ N\in \left\{10, 20, 40, 80\right\} $ observations.
+In total, we generated data from 6 generating processes, and for each model we undertook $ R=100,000 $ estimations of the confidence interval.
+The quantity of interest is the coverage of each confidence interval which was computed as the proportion of times that the true value of the parameters (population mean or INB) were contained
+within the computed confidence intervals. Nominal coverage was set at 95\%.
+
+Both the sample mean and INB have asymptotic normal distributions and, therefore, the corresponding asymptotic confidence intervals were computed in the usual manner. Let $ \hat{T} $ denote the sample mean or INB and let $\theta $ be their true values. To compute the bootstrap confidence intervals we used the following two algorithms.
+
+
+\noindent \textbf{Percentile method.}
+
+\begin{enumerate}
+	\item Repeat the following $ b=1,\ldots, B=199 $ times:
+	
+	\begin{enumerate}
+		\item Draw a sample of size $ N $ randomly with replacement from the original data set.
+		\item Compute and save the statistic of interest from each simulated sample,  $ \hat{T}_b $
+	\end{enumerate}
+	\item Select the $ \alpha $ and $ 1-\alpha $ percentiles of the series $ (\hat{T}_b)_{b=1}^B $. Denote these $ \hat{T}_{B,\alpha} $  and $ \hat{T}_{B,1-\alpha} $ respectively.
+	\item A percentile method bootstrap confidence interval for $ \theta$ is
+	\begin{equation}
+	( \hat{T}_{B,\alpha},  \hat{T}_{B,1-\alpha}  )
+	\end{equation}
+\end{enumerate}
+
+
+\noindent \textbf{Percentile-t method.}
+\begin{enumerate}
+	\item Compute $ \hat{T} $ and its standard error $ \hat{\sigma}_T$. Retain these values.
+	\item Repeat the following  $ b=1,\ldots, B=199 $ times:
+	\begin{enumerate}
+		\item Draw a sample of size $ N $ randomly with replacement from the original data set.
+		\item Compute the statistic of interest from each simulated sample,  $ \hat{T}_b $, along with its standard error $\hat{se}(\hat{T}_b)$.
+		\item Compute and save $t_b= (\hat{T}_b -\hat{T})/\hat{se}(\hat{T}_b)$
+	\end{enumerate}
+	\item Select the $ \alpha $ and $ 1-\alpha $ percentiles of the series $ (t_b)_{b=1}^B $. Denote these $ t_{b,\alpha} $  and $ t_{b,1-\alpha} $ respectively.
+	\item A percentile-t method bootstrap confidence interval for $ \theta $ is
+	\newline
+	\begin{equation}
+	( \hat{T} - \hat{\sigma}_T t_{b,1-\alpha},  \hat{T} -  \hat{\sigma}_T t_{b,\alpha} )
+	\end{equation}
+\end{enumerate}
+
+
+
+\subsection{Experiment 1.}
+Data were drawn from four distributions, namely $(i)$ $N(0,1)$, $(ii)$  $\chi^2_2 $,  $(iii)$ $\Gamma(2,2)$, $(iv)$ $N(0,1)+ LN $ where $ LN $ is a standard log normal distribution. The parameter of interest was the population mean, $ E(Y) $, which was estimated by the sample mean, $ \bar{Y} $. Note that case $ (i) $ is the most favourable to asymptotic theory, as the central limit theorem approximates the distribution of the statistic exactly. Case $ (iv) $ is a simple version of the data generating process that we consider in the following section. The results of the simulation are given in table \ref{table_simulation_1}.
+
+\begin{table}
+	\caption{Experiment 1. Empirical coverage of asymptotic and bootstrap confidence intervals. $ R=100,000 $. $ B=199 $. Nominal coverage 95\%. }
+	\centering
+	\scriptsize
+	\begin{tabular}{lcccc}
+		\hline \hline
+		\multicolumn{5}{c}{}\\
+		\multicolumn{5}{c}{ $ Y\sim N(0,1) $ }\\
+		$ N $&&Asymptotic & Percentile & Percentile-t \\
+		\hline \multicolumn{5}{c}{}\\
+		10 & &0.94048 &     0.90478 &0.95098\\
+		20 && 0.94510 &     0.92852&0.94999\\
+		40 &&0.94804  &   0.94057 &0.95064\\
+		80 && 0.94824 &     0.94482&0.95009\\
+		\multicolumn{5}{c}{}\\
+		\multicolumn{5}{c}{$ Y\sim \chi^2_2 $ }\\
+		$ N $&&Asymptotic & Percentile & Percentile-t \\
+		\hline \multicolumn{5}{c}{}\\
+		10 & & 0.89076 &     0.84258 &0.94167\\
+		20 && 0.91467  &    0.88848&0.94689\\
+		40 &&0.92941    &  0.91421 &0.94778\\
+		80 && 0.94010    &  0.93239&0.95001\\
+		\multicolumn{5}{c}{}\\
+		\multicolumn{5}{c}{$ Y\sim \Gamma(2,2) $ }\\
+		$ N $&&Asymptotic & Percentile & Percentile-t \\
+		\hline \multicolumn{5}{c}{}\\
+		10 & &0.91496   &   0.87209& 0.94615\\
+		20 &&  0.92777  &    0.90744&0.94802\\
+		40 &&0.93839   &  0.92701 &0.92643\\
+		80 && 0.94333  &    0.93764 &0.94888\\
+		\multicolumn{5}{c}{}\\
+		\multicolumn{5}{c}{ $ Y\sim N(0,1) + LN $}\\
+		$ N $&&Asymptotic & Percentile & Percentile-t\\
+		\hline \multicolumn{5}{c}{}\\
+		10 & & 0.89652 &     0.85612 &0.91623\\
+		20 &&  0.90857 &     0.88855&0.91958\\
+		40 &&0.91875   &   0.90651 &0.92643\\
+		80 && 0.93144  &    0.92480&0.93541\\
+		\hline \hline
+	\end{tabular}
+	\label{table_simulation_1}
+\end{table}
+The top panel in the table contains the results obtained when data came from the $N(0,1)$ distribution.
+The confidence intervals produced by asymptotic theory exhibit excellent coverage, close to the nominal 95\%. However, the performance of the percentile method is poor.
+For $ N=10 $, the coverage of the simulated confidence intervals is just 0.90 (compare with the value of 0.940 obtained with asymptotic methods).
+%%%
+As the underlying statistics in the bootstrap and asymptotic methods are identical
+the discrepancy can only be due  to simulation error, which suggests that $ B=199 $ is too small.
+%%%
+Yet, for identical $ B $, the bootstrap algorithm based on the studentized mean,the percentile-t method, provides outstanding coverage, considerably superior to the two previous methods.
+Thus, for $ N=10 $ we obtain a coverage of 0.95098, implying an error of 0.1031\%. This is in contrast to the  error of  1.002\% obtained with asymptotic approximations.
+As $ N $ increases, the performance of the asymptotic and percentile methods improves, as expected, but so does the performance of the percentile-t method.
+Thus for $ N=80 $ the discrepancies between empirical and nominal coverage levels are 0.18\%, 0.54\% and 0.009\% for the asymptotic, percentile method and percentile-t method respectively.
+The conclusion remains invariant for each of the remaining three data generating processes which are included to illustrate the ability of appropriate bootstrap methods to capture non-normal features of distributions, such as skewness and kurtosis.
+Even in the least favourable scenario, case $(iv)$, the percentile-t method clearly improves over asymptotic and percentile methods.
+
+\subsection{Experiment 2.}
+Here we revisit the data generating process in \cite{NixonWonderlingGrieve2010HealthEconomics} and work with the INB described in section 1.
+We consider the coverage of three sets of confidence intervals for $ INB $ when data were generated from the following design. Firstly,
+\begin{eqnarray}
+\log C_0 &=& \sigma_c* N(0,1)+\log(50000) \\
+\log C_1 &=& \sigma_c* N(0,1)+\log(50000+30000)
+\end{eqnarray}
+so that $ C_0, C_1 $ have log-normal distributions. Here $ \sigma $ also determines the skewness of the distributions. For instance, $ \sigma =0.05 $ implies a skewness of 0.69, while $ \sigma = 0.5 $ implies a skewness of 2.93. The effectiveness variables are:
+\begin{eqnarray}
+B_0 &=& \sigma_b N(5,1)+ 0.3(\log C_0 -\log(50000)) \\
+B_1 &=& \sigma_b N(6,1)+ 0.3(\log C_1 -\log(50000+30000))
+\end{eqnarray}
+where $ \sigma_b =2 $. In the simulations the standard error were fixed at $\sigma_e=2  $ and $ \sigma_c\in\left\{0.05, 0.5\right\} $.
+%%%
+Willingness to pay was set at $ K=20,000 $ which implies a true $ INB $ of -10,000.
+%%%
+
+\begin{table}
+	\scriptsize
+	\centering\medskip
+	\begin{tabular}{lcccccccc}
+		
+		&&\multicolumn{3}{c}{$ \sigma_c=0.05 $}&&\multicolumn{3}{c}{$ \sigma_c=0.5 $}\\
+		$ N $&& Asyp. &Percentile& Percentile-t&& Asyp. &Percentile& Percentile-t\\
+		\cline{3-5} \cline{7-9}
+		10&&0.92019&0.92024  &0.92021 &&0.91985&0.91679&0.92205\\
+		20&&0.93692&0.93691  &0.93723 &&0.93371&0.93133&0.93599\\
+		40&&0.94332&0.94332      &0.94381 &&0.93445&0.93275&0.93634\\
+		80&&0.94639& 0.94698      &0.94765 &&0.92582&0.92486&0.92822\\
+	\end{tabular}
+	\caption{\label{table_montecarlo_2}  Monte Carlo Simulation. $ B=199 $, $ R=100,000 $. The left panel refers to a scenario with low skewness in the distribution of costs, while the right panel refers to a situation of high skewness in the distribution of costs. }
+\end{table}
+The results of this simulation are given in table \ref{table_montecarlo_2}. We observe that all three methods fall short of producing outstanding results for the sample sizes considered.
+The percentile-t method provides the best coverage, followed by the asymptotic approximation and, lastly, the percentile method algorithm.  
+
+\section{Conclusion.}
+In this note we show  that  `studentizing' the Incremental Net Benefit statistic results in an asymptotic pivot quantity that provides improved inference in cost-effectiveness analysis. We  provide some supporting Monte Carlo experiment. However, improvements are modest and both  asymptotic and bootstrap methods tend to have weak coverage, particularly with skewed distributions. This is reminiscent of the results in \cite{davidsonFlachaire2007joe}, who found that both asymptotic and standard bootstrap methods exhibit poor coverage in some standard inequality and poverty measures. Those authors suggested a parametric bootstrap that partly ameliorated coverage in at least moderate samples. Thus, future research could explore the validity of parametric bootstrap methods in cost-effectiveness analysis.   
+ 
+
+
+\bibliography{bibFinalv3}
+\bibliographystyle{experiment}
+
+\newpage
+
+
+\end{document}
